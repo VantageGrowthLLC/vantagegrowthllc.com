@@ -490,6 +490,10 @@ header .wrap.nav{max-width:none;padding-left:clamp(28px,5vw,120px);padding-right
     e.preventDefault();
     setTimeout(function(){
       var fd=new FormData(f);fd.delete('redirect');
+      var empty=[];fd.forEach(function(v,k){if(typeof v==='string'&&!v.trim())empty.push(k);});
+      empty.forEach(function(k){fd.delete(k);});
+      var biz=(fd.get('Business name')||'').trim();
+      if(biz)fd.set('subject','New inquiry: '+biz);
       fetch(f.action,{method:'POST',headers:{'Accept':'application/json'},body:fd})
         .then(function(r){return r.json().then(function(j){return {ok:r.ok&&j.success,j:j};});})
         .then(function(res){
