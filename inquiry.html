@@ -360,12 +360,12 @@ header .wrap.nav{max-width:none;padding-left:clamp(28px,5vw,120px);padding-right
     <h1 class="ph inq-h">Tell us about your business.</h1>
     <p class="inq-lead">Share a few details and we'll reach out to talk through where you are and where you want to go. No commitment, just a conversation.</p>
 
-    <form id="inq-form" class="inq-form" action="https://formsubmit.co/contact@vantagegrowthllc.com" method="POST" novalidate>
-      <input type="hidden" name="_subject" value="New website inquiry - Vantage Growth">
-      <input type="hidden" name="_template" value="table">
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_next" id="inq-next" value="https://vantagegrowthllc.com/thank-you.html">
-      <input type="text" name="_honey" class="inq-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <form id="inq-form" class="inq-form" action="https://api.web3forms.com/submit" method="POST" novalidate>
+      <input type="hidden" name="access_key" value="6a4eb685-60a0-4e4a-8b4b-8e013d6a6912">
+      <input type="hidden" name="subject" value="New website inquiry - Vantage Growth">
+      <input type="hidden" name="from_name" value="Vantage Growth Website">
+      <input type="hidden" name="redirect" id="inq-next" value="https://vantagegrowthllc.com/thank-you.html">
+      <input type="checkbox" name="botcheck" class="inq-hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none">
       <input type="hidden" name="Packages of interest" id="inq-pk-field" value="">
 
       <div class="inq-grid">
@@ -486,6 +486,21 @@ header .wrap.nav{max-width:none;padding-left:clamp(28px,5vw,120px);padding-right
     var picked=[];f.querySelectorAll('.pk-opt input:checked').forEach(function(c){picked.push(c.value)});
     document.getElementById('inq-pk-field').value=picked.length?picked.join(', '):'None selected';
     btn.disabled=true;btn.innerHTML='Sending&hellip;';
+    if(!window.fetch||!window.FormData)return;
+    e.preventDefault();
+    setTimeout(function(){
+      var fd=new FormData(f);fd.delete('redirect');
+      fetch(f.action,{method:'POST',headers:{'Accept':'application/json'},body:fd})
+        .then(function(r){return r.json().then(function(j){return {ok:r.ok&&j.success,j:j};});})
+        .then(function(res){
+          if(res.ok){location.href=nx.value;return;}
+          throw new Error((res.j&&res.j.message)||'send failed');
+        })
+        .catch(function(){
+          btn.disabled=false;btn.innerHTML='Send Inquiry &rarr;';
+          err.textContent='Sorry, your inquiry didn’t go through. Please try again, or email us at contact@vantagegrowthllc.com.';
+        });
+    },0);
   });
   window.addEventListener('pageshow',function(){btn.disabled=false;btn.innerHTML='Send Inquiry &rarr;';});
 })();
